@@ -1,7 +1,7 @@
-import { BskyAgent } from "@atproto/api";
+import { AtpAgent } from "@atproto/api";
 import { BlueSkyPost } from "../types/blueskypostType";
 
-const agent = new BskyAgent({
+const agent = new AtpAgent({
   service: "https://bsky.social",
 });
 
@@ -31,7 +31,8 @@ export const fetchBlueSkyPosts = async (
       q: "Vue Js",
     });
 
-    return searchResults.data.posts;
+    return searchResults.data.posts as BlueSkyPost[];
+
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);
     throw new Error("Impossible de récupérer les posts BlueSky.");
