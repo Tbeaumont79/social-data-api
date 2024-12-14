@@ -32,7 +32,6 @@ export const fetchBlueSkyPosts = async (
     });
 
     return searchResults.data.posts as BlueSkyPost[];
-
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);
     throw new Error("Impossible de récupérer les posts BlueSky.");
