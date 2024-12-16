@@ -1,17 +1,11 @@
-import { BskyAgent } from "@atproto/api";
+import AtpAgent from "@atproto/api";
 import { BlueSkyPost } from "../types/blueskypostType";
 
-const agent = new BskyAgent({
+const agent = new AtpAgent({
   service: "https://bsky.social",
 });
 
 const authenticateAgent = async () => {
-  if (!process.env.BSKY_USERNAME || !process.env.BSKY_PASSWORD) {
-    throw new Error(
-      "Identifiants BlueSky non définis dans les variables d’environnement."
-    );
-  }
-
   await agent.login({
     identifier: process.env.BSKY_USERNAME,
     password: process.env.BSKY_PASSWORD,

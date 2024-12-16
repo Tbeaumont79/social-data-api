@@ -1,4 +1,3 @@
-import AtpAgent from "@atproto/api";
 import dotenv from "dotenv";
 import { vi } from "vitest";
 
@@ -6,7 +5,7 @@ dotenv.config({ path: ".env" });
 
 vi.mock("@atproto/api", () => {
   return {
-    AtpAgent: {
+    AtpAgent: vi.fn().mockImplementation(() => ({
       login: vi.fn().mockResolvedValue(true),
       app: {
         bsky: {
@@ -32,6 +31,6 @@ vi.mock("@atproto/api", () => {
           },
         },
       },
-    },
+    })),
   };
 });
