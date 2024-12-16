@@ -1,19 +1,17 @@
-import { describe, expect, test, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fetchBlueSkyPosts } from "../src/services/blueskyService";
-import { AtpAgent, createAgent } from "@atproto/api";
+import { AtpAgent } from "@atproto/api";
 
-let agent: AtpAgent;
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  const agent = new AtpAgent({
+    service: "https://bsky.social",
+  });
+})
 
-  agent = createAgent({ service: "https://bsky.social" });
-  agent.login = vi.fn().mockResolvedValue(true);
-});
 describe("fetchBlueSkyPosts", () => {
   it("should return an array of posts", async () => {
     const posts = await fetchBlueSkyPosts("test_tag");
-
     expect(Array.isArray(posts)).toBe(true);
     expect(posts.length).toBe(2);
     expect(posts[0]).toMatchObject({
