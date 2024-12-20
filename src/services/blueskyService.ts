@@ -23,9 +23,9 @@ export const fetchBlueSkyPosts = async (
     const searchResults = await agent.app.bsky.feed.searchPosts({
       tag: [`${tag}`],
       q: "Vue Js",
+      lang: "fr",
     });
-
-    return searchResults.data.posts as BlueSkyPost[];
+    return searchResults.data.posts as unknown as BlueSkyPost[];
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);
     throw new Error("Impossible de récupérer les posts BlueSky.");

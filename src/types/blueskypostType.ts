@@ -1,11 +1,59 @@
 export interface BlueSkyPost {
   uri: string;
-  text?: string;
-  createdAt?: string;
+  cid: string;
   author: {
     did: string;
     handle: string;
     displayName: string;
+    avatar: string;
+    associated: {
+      chat: {
+        allowIncoming: string;
+      };
+    };
+    viewer: {
+      muted: boolean;
+      blockedBy: boolean;
+    };
+    labels: {
+      src: string;
+      uri: string;
+      cid: string;
+      val: string;
+      cts: string;
+    }[];
+    createdAt: string;
   };
-  embeds?: any;
+  record: {
+    $type: string;
+    createdAt: string;
+    langs: string[];
+    reply: {
+      parent: {
+        cid: string;
+        uri: string;
+      };
+      root: {
+        cid: string;
+        uri: string;
+      };
+    };
+    text: string;
+  };
+  replyCount: number;
+  repostCount: number;
+  likeCount: number;
+  quoteCount: number;
+  indexedAt: string;
+  viewer: {
+    threadMuted: boolean;
+    embeddingDisabled: boolean;
+  };
+  labels: {
+    src: string;
+    uri: string;
+    cid: string;
+    val: string;
+    cts: string;
+  };
 }
