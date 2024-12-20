@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@atproto/api": "^0.13.20",
+    "@supabase/supabase-js": "^2.47.10",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
   }
