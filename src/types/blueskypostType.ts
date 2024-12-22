@@ -28,6 +28,22 @@ export interface BlueSkyPost {
     $type: string;
     createdAt: string;
     langs: string[];
+    embed: {
+      $type: string;
+      uri: string;
+      title: string;
+      external: {
+        description: string;
+        thumb: {
+          type: string;
+          ref: {
+            link: string;
+          };
+          mimtype: string;
+          size: number;
+        };
+      };
+    };
     reply: {
       parent: {
         cid: string;
