@@ -17,6 +17,7 @@ export const getpostbytagController = async (req, res) => {
         post.record.embed.external.description &&
         post.record.embed.external["title"] &&
         post.record.embed.external.thumb;
+
       const customEmbed = hasEmbed
         ? {
             external: {
@@ -34,7 +35,10 @@ export const getpostbytagController = async (req, res) => {
         embed: customEmbed,
       };
     });
-    res.json(formattedPosts);
+
+    console.log("Ref:", posts[0].record.embed.external.thumb?.ref);
+
+    res.json(posts);
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ error: "Error fetching posts" });

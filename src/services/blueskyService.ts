@@ -12,7 +12,14 @@ const authenticateAgent = async () => {
   });
 };
 export const generateBlueskyImageUrl = (thumb: any): string | null => {
-  if (!thumb?.ref?.$link || !thumb.mimeType) return null;
+  if (!thumb?.ref["$link"]|| !thumb.mimeType) {
+    console.log(
+      "je passe ici et thumb.ref.$link n'existe pas",
+      thumb.ref["$link"]
+    );
+    console.log("je passe ici et thumb.mimeType n'existe pas", thumb.mimeType);
+    return null;
+  }
 
   const baseUrl = "https://cdn.bsky.app/img/feed_thumbnail/plain";
   const did = "did:plc:i3xtdbvud6pgb62n5g2uw5i2"; // À remplacer dynamiquement si besoin
