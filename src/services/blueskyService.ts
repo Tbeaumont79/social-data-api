@@ -34,7 +34,7 @@ export const generateBlueskyPostUrl = (uri: string): string => {
   return `https://bsky.app/profile/${did}/post/${rkey}`;
 };
 
-export const fetchBlueSkyPosts = async (
+export const fetchAndStoreBlueSkyPosts = async (
   tag: string
 ): Promise<BlueSkyPost[]> => {
   try {
@@ -47,7 +47,34 @@ export const fetchBlueSkyPosts = async (
       q: tag,
       lang: "fr",
     });
-    return searchResults.data.posts as unknown as BlueSkyPost[];
+    const posts = searchResults.data.posts as unknown as BlueSkyPost[];
+    const formattedPosts = posts.map((post) => {
+      const url = generateBlueskyPostUrl(post.uri);
+      const hasEmbed =
+        post.record.embed &&
+        post.record.embed.external &&
+        post.record.embed.external.description &&
+        post.record.embed.external["title"] &&
+        post.record.embed.external.thumb;
+
+      const customEmbed = hasEmbed
+        ? {
+            external: {
+              description: post.record.embed.external.description,
+              title: post.record.embed.external["title"],
+              thumb: generateBlueskyImageUrl(post.record.embed.external.thumb),
+            },
+          }
+        : null;
+      return {
+        url,
+        text: post.record.text,
+        createdAt: post.record.createdAt,
+        author: post.author.displayName,
+        embed: customEmbed,
+      };
+    });
+    return formattedPosts as unknown as BlueSkyPost[];
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);
     throw new Error("Impossible de récupérer les posts BlueSky.");
