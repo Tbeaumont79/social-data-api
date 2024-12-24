@@ -11,7 +11,7 @@ const authenticateAgent = async () => {
     password: process.env.BSKY_PASSWORD,
   });
 };
-export const generateBlueskyImageUrl = (thumb: any): string | null => {
+const generateBlueskyImageUrl = (thumb: any): string | null => {
   if (!thumb?.ref || !thumb.mimeType) return null;
 
   const baseUrl = "https://cdn.bsky.app/img/feed_thumbnail/plain";
@@ -22,7 +22,7 @@ export const generateBlueskyImageUrl = (thumb: any): string | null => {
   return `${baseUrl}/${did}/${link}@${extension}`;
 };
 
-export const generateBlueskyPostUrl = (uri: string): string => {
+const generateBlueskyPostUrl = (uri: string): string => {
   const match = uri.match(
     /at:\/\/(did:[\w:]+)\/app\.bsky\.feed\.post\/([\w]+)/
   );
@@ -57,26 +57,32 @@ export const fetchAndStoreBlueSkyPosts = async (
         post.record.embed.external["title"] &&
         post.record.embed.external.thumb;
 
-      const customEmbed = hasEmbed
+      return hasEmbed
         ? {
-            external: {
-              description: post.record.embed.external.description,
-              title: post.record.embed.external["title"],
-              thumb: generateBlueskyImageUrl(post.record.embed.external.thumb),
-            },
+            url,
+            text: post.record.text,
+            created_at: post.record.createdAt,
+            author: post.author.displayName,
+            embed_description: post.record.embed.external.description,
+            embed_title: post.record.embed.external["title"],
+            embed_thumb: generateBlueskyImageUrl(
+              post.record.embed.external.thumb
+            ),
           }
-        : null;
-      return {
-        url,
-        text: post.record.text,
-        createdAt: post.record.createdAt,
-        author: post.author.displayName,
-        embed: customEmbed,
-      };
+        : {
+            url,
+            text: post.record.text,
+            created_at: post.record.createdAt,
+            author: post.author.displayName,
+            embed_description: null,
+            embed_title: null,
+            embed_thumb: null,
+          };
     });
-    // TODO : update l'objet formattedPosts avec la fonction insertBlueSkyPost
-    
-    const result = await insertBlueSkyPost(formattedPosts);
+
+    for (const post of formattedPosts) {
+      await insertBlueSkyPost(post);
+    }
     return formattedPosts as unknown as BlueSkyPost[];
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);
