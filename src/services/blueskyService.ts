@@ -1,6 +1,7 @@
 import AtpAgent from "@atproto/api";
-import { BlueSkyPost } from "../types/blueskypostType";
+import { BlueSkyPost, BlueSkyPostWithImage } from "../types/blueskypostType";
 import { insertBlueSkyPost } from "../repositories/bluesky.repository";
+
 const agent = new AtpAgent({
   service: "https://bsky.social",
 });
@@ -11,7 +12,8 @@ const authenticateAgent = async () => {
     password: process.env.BSKY_PASSWORD,
   });
 };
-const generateBlueskyImageUrl = (thumb: any): string | null => {
+const generateBlueskyImageUrl = (thumb: BlueSkyPostWithImage): string | null => {
+  console.log("thumb object", thumb);
   if (!thumb?.ref || !thumb.mimeType) return null;
 
   const baseUrl = "https://cdn.bsky.app/img/feed_thumbnail/plain";
@@ -80,9 +82,9 @@ export const fetchAndStoreBlueSkyPosts = async (
           };
     });
 
-    for (const post of formattedPosts) {
-      await insertBlueSkyPost(post);
-    }
+    // for (const post of formattedPosts) {
+    //   await insertBlueSkyPost(post);
+    // }
     return formattedPosts as unknown as BlueSkyPost[];
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);

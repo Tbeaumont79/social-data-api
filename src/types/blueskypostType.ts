@@ -73,3 +73,12 @@ export interface BlueSkyPost {
     cts: string;
   };
 }
+
+export interface BlueSkyPostWithImage {
+  type: string;
+  ref: {
+    link: string;
+  };
+  mimetype: string;
+  size: number;
+}
