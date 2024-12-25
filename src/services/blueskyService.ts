@@ -1,5 +1,9 @@
 import AtpAgent from "@atproto/api";
-import { BlueSkyPost, BlueSkyPostWithImage } from "../types/blueskypostType";
+import {
+  BlueSkyPost,
+  BlueSkyPostWithImage,
+  BlueSkyFilteredPost,
+} from "../types/blueskypostType";
 import { insertBlueSkyPost } from "../repositories/bluesky.repository";
 
 const agent = new AtpAgent({
@@ -37,19 +41,18 @@ const generateBlueskyPostUrl = (uri: string): string => {
 
 export const fetchAndStoreBlueSkyPosts = async (
   tag: string
-): Promise<BlueSkyPost[]> => {
+): Promise<BlueSkyFilteredPost[]> => {
   try {
     if (!agent.session) {
       await authenticateAgent();
     }
-
     const searchResults = await agent.app.bsky.feed.searchPosts({
       tag: [`${tag}`],
       q: tag,
       lang: "fr",
     });
     const posts = searchResults.data.posts as unknown as BlueSkyPost[];
-    const formattedPosts = posts.map((post) => {
+    const filteredPost: BlueSkyFilteredPost[] = posts.map((post) => {
       const url = generateBlueskyPostUrl(post.uri);
       const hasEmbed =
         post.record.embed &&
@@ -65,7 +68,7 @@ export const fetchAndStoreBlueSkyPosts = async (
             created_at: post.record.createdAt,
             author: post.author.displayName,
             embed_description: post.record.embed.external.description,
-            embed_title: post.record.embed.external["title"],
+            embed_title: post.record.embed.external["title"] as string,
             embed_thumb: generateBlueskyImageUrl(
               post.record.embed.external.thumb
             ),
@@ -80,11 +83,10 @@ export const fetchAndStoreBlueSkyPosts = async (
             embed_thumb: null,
           };
     });
-
     // for (const post of formattedPosts) {
     //   await insertBlueSkyPost(post);
     // }
-    return formattedPosts as unknown as BlueSkyPost[];
+    return filteredPost;
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);
     throw new Error("Impossible de récupérer les posts BlueSky.");

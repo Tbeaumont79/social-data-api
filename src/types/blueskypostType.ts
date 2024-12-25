@@ -74,6 +74,16 @@ export interface BlueSkyPost {
   };
 }
 
+export interface BlueSkyFilteredPost {
+  url: string;
+  text: string;
+  created_at: string;
+  author: string;
+  embed_description: string;
+  embed_title: string;
+  embed_thumb: string;
+}
+
 export interface BlueSkyPostWithImage {
   mimtype: any;
   ref: {
