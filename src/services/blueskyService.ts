@@ -12,14 +12,13 @@ const authenticateAgent = async () => {
     password: process.env.BSKY_PASSWORD,
   });
 };
-const generateBlueskyImageUrl = (thumb: BlueSkyPostWithImage): string | null => {
-  console.log("thumb object", thumb);
-  if (!thumb?.ref || !thumb.mimeType) return null;
+const generateBlueskyImageUrl = (thumb: BlueSkyPostWithImage): string => {
+  if (!thumb?.ref || !thumb.mimtype) return null;
 
   const baseUrl = "https://cdn.bsky.app/img/feed_thumbnail/plain";
   const did = "did:plc:i3xtdbvud6pgb62n5g2uw5i2"; // À remplacer dynamiquement si besoin
   const link = thumb.ref;
-  const extension = thumb.mimeType === "image/png" ? "png" : "jpeg";
+  const extension = thumb.mimtype === "image/png" ? "png" : "jpeg";
 
   return `${baseUrl}/${did}/${link}@${extension}`;
 };

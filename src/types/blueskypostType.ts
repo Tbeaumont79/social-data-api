@@ -75,10 +75,9 @@ export interface BlueSkyPost {
 }
 
 export interface BlueSkyPostWithImage {
-  type: string;
+  mimtype: any;
   ref: {
     link: string;
   };
-  mimetype: string;
   size: number;
 }
