@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabaseClient";
-
-export async function insertBlueSkyPost(post: any) {
+import { BlueSkyFilteredPost } from "../types/blueskypostType";
+export async function insertBlueSkyPost(post: BlueSkyFilteredPost) {
   const { data, error } = await supabase.from("bluesky_posts").insert(post);
 
   if (error) {

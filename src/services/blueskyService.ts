@@ -5,6 +5,7 @@ import {
   BlueSkyPostWithImage,
   BlueSkyFilteredPost,
 } from "../types/blueskypostType";
+import { insertBlueSkyPost } from "../repositories/bluesky.repository";
 
 const agent = new AtpAgent({
   service: "https://bsky.social",
@@ -85,9 +86,9 @@ export const fetchAndStoreBlueSkyPosts = async (
             embed_thumb: null,
           };
     });
-    // for (const post of formattedPosts) {
-    //   await insertBlueSkyPost(post);
-    // }
+    for (const post of filteredPost) {
+      await insertBlueSkyPost(post);
+    }
     return filteredPost;
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);
