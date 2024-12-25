@@ -1,10 +1,10 @@
 import AtpAgent from "@atproto/api";
 import {
   BlueSkyPost,
+  BlueSkySearchResult,
   BlueSkyPostWithImage,
   BlueSkyFilteredPost,
 } from "../types/blueskypostType";
-import { insertBlueSkyPost } from "../repositories/bluesky.repository";
 
 const agent = new AtpAgent({
   service: "https://bsky.social",
@@ -46,12 +46,14 @@ export const fetchAndStoreBlueSkyPosts = async (
     if (!agent.session) {
       await authenticateAgent();
     }
-    const searchResults = await agent.app.bsky.feed.searchPosts({
-      tag: [`${tag}`],
-      q: tag,
-      lang: "fr",
-    });
-    const posts = searchResults.data.posts as unknown as BlueSkyPost[];
+    const searchResults: BlueSkySearchResult =
+      (await agent.app.bsky.feed.searchPosts({
+        tag: [`${tag}`],
+        q: tag,
+        lang: "fr",
+      })) as unknown as BlueSkySearchResult;
+
+    const posts = searchResults.data.posts as BlueSkyPost[];
     const filteredPost: BlueSkyFilteredPost[] = posts.map((post) => {
       const url = generateBlueskyPostUrl(post.uri);
       const hasEmbed =

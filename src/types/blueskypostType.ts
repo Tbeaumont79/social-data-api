@@ -4,25 +4,25 @@ export interface BlueSkyPost {
   author: {
     did: string;
     handle: string;
-    displayName: string;
-    avatar: string;
-    associated: {
-      chat: {
-        allowIncoming: string;
+    displayName?: string;
+    avatar?: string;
+    associated?: {
+      chat?: {
+        allowIncoming?: string;
       };
     };
-    viewer: {
-      muted: boolean;
-      blockedBy: boolean;
+    viewer?: {
+      muted?: boolean;
+      blockedBy?: boolean;
     };
-    labels: {
+    labels?: {
       src: string;
       uri: string;
       cid: string;
       val: string;
       cts: string;
     }[];
-    createdAt: string;
+    createdAt?: string;
   };
   record: {
     $type: string;
@@ -65,7 +65,7 @@ export interface BlueSkyPost {
     threadMuted: boolean;
     embeddingDisabled: boolean;
   };
-  labels: {
+  labels?: {
     src: string;
     uri: string;
     cid: string;
@@ -73,7 +73,11 @@ export interface BlueSkyPost {
     cts: string;
   };
 }
-
+export interface BlueSkySearchResult {
+  data: {
+    posts: BlueSkyPost[];
+  };
+}
 export interface BlueSkyFilteredPost {
   url: string;
   text: string;
