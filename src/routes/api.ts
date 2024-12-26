@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { getpostbytagController } from "../controllers/getpostbytagController";
+import { getAndStoreBlueSkyPostsController } from "../controllers/getandstoreblueskypostscontroller";
 
 const router = Router();
 
-router.get("/posts/:tag", getpostbytagController);
+router.get("/posts/:tag", getAndStoreBlueSkyPostsController);
 
 export default router;

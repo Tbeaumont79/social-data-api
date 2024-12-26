@@ -1,5 +1,5 @@
 import { fetchAndStoreBlueSkyPosts } from "../services/blueskyService";
-export const getpostbytagController = async (req, res) => {
+export const getAndStoreBlueSkyPostsController = async (req, res) => {
   try {
     const tag = req.params.tag;
     const posts = await fetchAndStoreBlueSkyPosts(tag);
