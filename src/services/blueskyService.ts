@@ -5,7 +5,10 @@ import {
   BlueSkyPostWithImage,
   BlueSkyFilteredPost,
 } from "../types/blueskypostType";
-import { insertBlueSkyPost } from "../repositories/bluesky.repository";
+import {
+  insertBlueSkyPost,
+  getBlueSkyPostsUrl,
+} from "../repositories/bluesky.repository";
 
 const agent = new AtpAgent({
   service: "https://bsky.social",
@@ -54,16 +57,28 @@ export const fetchAndStoreBlueSkyPosts = async (
         lang: "fr",
       })) as unknown as BlueSkySearchResult;
 
-    const posts = searchResults.data.posts as BlueSkyPost[];
+    let posts = searchResults.data.posts as BlueSkyPost[];
+
+    const urlPosts = await getBlueSkyPostsUrl(); // getting url from db
+    posts = posts.filter((post) => {
+      // filtering posts by url
+      const url = generateBlueskyPostUrl(post.uri);
+      return !urlPosts.some((urlPost) => urlPost.url === url);
+    });
+
+    if (posts.length === 0) {
+      // if no new posts found return empty array
+      return [];
+    }
     const filteredPost: BlueSkyFilteredPost[] = posts.map((post) => {
       const url = generateBlueskyPostUrl(post.uri);
+
       const hasEmbed =
         post.record.embed &&
         post.record.embed.external &&
         post.record.embed.external.description &&
         post.record.embed.external["title"] &&
         post.record.embed.external.thumb;
-
       return hasEmbed
         ? {
             url,
@@ -86,9 +101,9 @@ export const fetchAndStoreBlueSkyPosts = async (
             embed_thumb: null,
           };
     });
-    // for (const post of filteredPost) {
-    //   await insertBlueSkyPost(post);
-    // }
+    for (const post of filteredPost) {
+      await insertBlueSkyPost(post);
+    }
     return filteredPost;
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);
