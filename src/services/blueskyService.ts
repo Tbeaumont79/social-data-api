@@ -115,7 +115,7 @@ export const fetchAndStoreBlueSkyPosts = async (
     );
     return filteredPost;
   } catch (error) {
-    console.error("Erreur lors de la récupération des posts BlueSky:", error);
-    throw new Error("Impossible de récupérer les posts BlueSky.");
+    console.error("Error fetching posts:", error);
+    throw new Error("Error fetching posts");
   }
 };
