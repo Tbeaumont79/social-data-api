@@ -7,7 +7,7 @@ import {
 } from "../types/blueskypostType";
 import {
   insertBlueSkyPost,
-  getBlueSkyPostsUrl,
+  getBlueSkyPostsByUrl,
 } from "../repositories/bluesky.repository";
 
 const agent = new AtpAgent({
@@ -59,7 +59,7 @@ export const fetchAndStoreBlueSkyPosts = async (
 
     let posts = searchResults.data.posts as BlueSkyPost[];
 
-    const urlPosts = await getBlueSkyPostsUrl(); // getting url from db
+    const urlPosts = await getBlueSkyPostsByUrl(); // getting url from db
     posts = posts.filter((post) => {
       // filtering posts by url
       const url = generateBlueskyPostUrl(post.uri);
