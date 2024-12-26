@@ -15,10 +15,19 @@ const agent = new AtpAgent({
 });
 
 const authenticateAgent = async () => {
-  await agent.login({
-    identifier: process.env.BSKY_USERNAME,
-    password: process.env.BSKY_PASSWORD,
-  });
+  if (!agent.session) {
+    try {
+      await agent.login({
+        identifier: process.env.BSKY_USERNAME,
+        password: process.env.BSKY_PASSWORD,
+      });
+    } catch (error) {
+      console.error("Error authenticating agent:", error);
+      throw new Error(
+        "Error cannot sign in to bluesky, have you provided the correct username and password in the .env file ?"
+      );
+    }
+  }
 };
 const generateBlueskyImageUrl = (thumb: BlueSkyPostWithImage): string => {
   if (!thumb?.ref || !thumb.mimtype) return null;
@@ -43,67 +52,67 @@ const generateBlueskyPostUrl = (uri: string): string => {
   return `https://bsky.app/profile/${did}/post/${rkey}`;
 };
 
+const filterNewPosts = async (posts: BlueSkyPost[]): Promise<BlueSkyPost[]> => {
+  // filtering new posts to avoid duplicates
+  const urlPosts = await getBlueSkyPostsByUrl();
+  return posts.filter((post) => {
+    const url = generateBlueskyPostUrl(post.uri);
+    return !urlPosts.some((urlPost) => urlPost.url === url);
+  });
+};
+const transformPost = (post: BlueSkyPost): BlueSkyFilteredPost => {
+  const url = generateBlueskyPostUrl(post.uri);
+
+  const hasEmbed =
+    post.record.embed &&
+    post.record.embed.external &&
+    post.record.embed.external.description &&
+    post.record.embed.external["title"] &&
+    post.record.embed.external.thumb;
+
+  return {
+    url,
+    text: post.record.text,
+    created_at: post.record.createdAt,
+    author: post.author.displayName,
+    embed_description: hasEmbed ? post.record.embed.external.description : null,
+    embed_title: hasEmbed
+      ? (post.record.embed.external["title"] as string)
+      : null,
+    embed_thumb: hasEmbed
+      ? generateBlueskyImageUrl(post.record.embed.external.thumb)
+      : null,
+  };
+};
 export const fetchAndStoreBlueSkyPosts = async (
   tag: string
 ): Promise<BlueSkyFilteredPost[]> => {
   try {
-    if (!agent.session) {
-      await authenticateAgent();
-    }
-    const searchResults: BlueSkySearchResult =
-      (await agent.app.bsky.feed.searchPosts({
-        tag: [`${tag}`],
-        q: tag,
-        lang: "fr",
-      })) as unknown as BlueSkySearchResult;
+    await authenticateAgent();
+    const searchResults = (await agent.app.bsky.feed.searchPosts({
+      tag: [`${tag}`],
+      q: tag,
+      lang: "fr",
+    })) as unknown as BlueSkySearchResult;
 
     let posts = searchResults.data.posts as BlueSkyPost[];
 
-    const urlPosts = await getBlueSkyPostsByUrl(); // getting url from db
-    posts = posts.filter((post) => {
-      // filtering posts by url
-      const url = generateBlueskyPostUrl(post.uri);
-      return !urlPosts.some((urlPost) => urlPost.url === url);
-    });
+    posts = await filterNewPosts(posts);
 
     if (posts.length === 0) {
       // if no new posts found return empty array
+      console.log("No new posts found");
       return [];
     }
-    const filteredPost: BlueSkyFilteredPost[] = posts.map((post) => {
-      const url = generateBlueskyPostUrl(post.uri);
+    const filteredPost = posts.map((post) => transformPost(post));
 
-      const hasEmbed =
-        post.record.embed &&
-        post.record.embed.external &&
-        post.record.embed.external.description &&
-        post.record.embed.external["title"] &&
-        post.record.embed.external.thumb;
-      return hasEmbed
-        ? {
-            url,
-            text: post.record.text,
-            created_at: post.record.createdAt,
-            author: post.author.displayName,
-            embed_description: post.record.embed.external.description,
-            embed_title: post.record.embed.external["title"] as string,
-            embed_thumb: generateBlueskyImageUrl(
-              post.record.embed.external.thumb
-            ),
-          }
-        : {
-            url,
-            text: post.record.text,
-            created_at: post.record.createdAt,
-            author: post.author.displayName,
-            embed_description: null,
-            embed_title: null,
-            embed_thumb: null,
-          };
-    });
-    for (const post of filteredPost) {
-      await insertBlueSkyPost(post);
-    }
+    await Promise.all(
+      filteredPost.map(async (post) => {
+        insertBlueSkyPost(post).catch((error) => {
+          console.error("Error inserting post:", post.url, error);
+        });
+      })
+    );
     return filteredPost;
   } catch (error) {
     console.error("Erreur lors de la récupération des posts BlueSky:", error);
