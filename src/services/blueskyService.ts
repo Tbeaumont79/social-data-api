@@ -8,6 +8,7 @@ import {
 import {
   insertBlueSkyPost,
   getBlueSkyPostsByUrl,
+  getAllBlueSkyPosts,
 } from "../repositories/bluesky.repository";
 
 const agent = new AtpAgent({
@@ -119,3 +120,12 @@ export const fetchAndStoreBlueSkyPosts = async (
     throw new Error("Error fetching posts");
   }
 };
+
+export const fetchBlueSkyPostsFromDB = async (): Promise<BlueSkyFilteredPost[]> => {
+  try {
+    return getAllBlueSkyPosts();
+  } catch (error) {
+    console.error("Error fetching posts from DB:", error);
+    throw new Error("Error fetching posts from DB");
+  }
+}

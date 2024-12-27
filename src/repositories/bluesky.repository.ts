@@ -16,3 +16,10 @@ export async function getBlueSkyPostsByUrl() {
   }
   return data;
 }
+export async function getAllBlueSkyPosts() {
+  const { data, error } = await supabase.from("bluesky_posts").select("*");
+  if (error) {
+    throw new Error("Error fetching posts: " + error.message);
+  }
+  return data;
+}
