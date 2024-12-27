@@ -5,7 +5,6 @@ export async function insertBlueSkyPost(post: BlueSkyFilteredPost) {
   if (error) {
     throw new Error("Error inserting post: " + error.message);
   }
-
   return data;
 }
 

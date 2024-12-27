@@ -8,4 +8,5 @@ const router = Router();
 
 router.get("/posts", getBlueSkyPostsHandler);
 router.post("/posts/:tag", postBlueSkyPostsHandler);
+
 export default router;

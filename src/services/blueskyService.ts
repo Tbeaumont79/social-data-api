@@ -70,12 +70,12 @@ const transformPost = (post: BlueSkyPost): BlueSkyFilteredPost => {
     post.record.embed.external.description &&
     post.record.embed.external["title"] &&
     post.record.embed.external.thumb;
-
   return {
     url,
     text: post.record.text,
     created_at: post.record.createdAt,
     author: post.author.displayName,
+    langs: post.record.langs,
     embed_description: hasEmbed ? post.record.embed.external.description : null,
     embed_title: hasEmbed
       ? (post.record.embed.external["title"] as string)
@@ -92,21 +92,17 @@ export const fetchAndStoreBlueSkyPosts = async (
     await authenticateAgent();
     const searchResults = (await agent.app.bsky.feed.searchPosts({
       tag: [`${tag}`],
+      limit: 50,
       q: tag,
-      lang: "fr",
     })) as unknown as BlueSkySearchResult;
-
     let posts = searchResults.data.posts as BlueSkyPost[];
-
     posts = await filterNewPosts(posts);
-
     if (posts.length === 0) {
       // if no new posts found return empty array
       console.log("No new posts found");
       return [];
     }
     const filteredPost = posts.map((post) => transformPost(post));
-
     await Promise.all(
       filteredPost.map(async (post) => {
         insertBlueSkyPost(post).catch((error) => {
@@ -121,11 +117,13 @@ export const fetchAndStoreBlueSkyPosts = async (
   }
 };
 
-export const fetchBlueSkyPostsFromDB = async (): Promise<BlueSkyFilteredPost[]> => {
+export const fetchBlueSkyPostsFromDB = async (): Promise<
+  BlueSkyFilteredPost[]
+> => {
   try {
     return getAllBlueSkyPosts();
   } catch (error) {
     console.error("Error fetching posts from DB:", error);
     throw new Error("Error fetching posts from DB");
   }
-}
+};

@@ -16,7 +16,7 @@ export const getBlueSkyPostsHandler = async (req: Request, res: Response) => {
 
 export const postBlueSkyPostsHandler = async (req: Request, res: Response) => {
   try {
-    const { tag } = req.body;
+    const { tag } = req.params;
     const posts = await fetchAndStoreBlueSkyPosts(tag);
     res.status(200).json({ success: true, data: posts });
   } catch (error) {
