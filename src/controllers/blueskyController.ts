@@ -14,6 +14,7 @@ export const getBlueSkyPostsHandler = async (req: Request, res: Response) => {
   }
 };
 
+
 export const postBlueSkyPostsHandler = async (req: Request, res: Response) => {
   try {
     const { tag } = req.params;
