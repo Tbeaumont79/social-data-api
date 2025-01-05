@@ -22,6 +22,22 @@ API_KEY=YOUR_API_KEY
 API_SECRET=YOUR_API_SECRET
 ```
 
+Also you need to create a supabase database and add the following tables:
+
+```bash
+CREATE TABLE IF NOT EXISTS bluesky_posts (
+    id SERIAL PRIMARY KEY,
+    url VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    text VARCHAR(255) NOT NULL,
+    langs VARCHAR(255) ARRAY NOT NULL,
+    embed_description VARCHAR(255) NOT NULL,
+    embed_title VARCHAR(255) NOT NULL,
+    embed_url VARCHAR(255) NOT NULL
+);
+```
+
 ## Usage
 
 ```bash
