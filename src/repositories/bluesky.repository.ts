@@ -20,5 +20,6 @@ export async function getAllBlueSkyPosts() {
   if (error) {
     throw new Error("Error fetching posts: " + error.message);
   }
+  console.log(data.length);
   return data;
 }

@@ -38,8 +38,9 @@ export const fetchAndStoreBlueSkyPosts = async (
     await authenticateAgent();
     const searchResults = (await agent.app.bsky.feed.searchPosts({
       tag: [`${tag}`],
-      limit: 50,
+      limit: 100,
       q: tag,
+      lang: "en",
     })) as unknown as BlueSkySearchResult;
     let posts = searchResults.data.posts as BlueSkyPost[];
     posts = await filterNewPosts(posts);
